@@ -13,3 +13,4 @@ a big thing to do is adding a bunch of different command line args to test, for 
 
 ## todo
 * do something with https://github.com/JuliaPerf/LinuxPerf.jl
+* async for looping `doit` calls

@@ -114,37 +114,47 @@ end
 
 "should we assume /compiled/ is empty for c? right now i dont"
 function doit(c, pkg)
-
     ch_comp_dir = expanduser("~/.julia/compiled/v$c")
     ispath(ch_comp_dir) && rm(ch_comp_dir; recursive=true)   # clear all precompiled files
 
     juliabin = "julia-" * c
-    Pkg.activate(; temp=true)
+    vn = VersionNumber(c)
+
+    rundir = joinpath(JuliaBenchmarker.DATADIR, "runs")
+    !ispath(rundir) && mkpath(rundir)
+    ch_dir = replace(c, "." => "_")
+    # str = pkg * "_" * replace(c, "." => "_")
+    dir = joinpath(rundir, pkg, ch_dir)
+    mkpath(dir)
+    Pkg.activate(dir)
     proj = Pkg.project()
     ptoml = proj.path
     id = basename(dirname(proj.path))
-
-    dir = dirname(proj.path)
 
     jl_vinfo = """using Pkg, InteractiveUtils; Pkg.activate("$ptoml";io = IOBuffer()); versioninfo()"""
     cmd = `$juliabin --startup=no -e $jl_vinfo`
     s = read(cmd, String)
     write(joinpath(dir, "versioninfo.txt"), s)
 
-    jl_cmd = """using Pkg; Pkg.activate("$ptoml";io = IOBuffer()); io = IOBuffer(); Pkg.add("$pkg"; io=IOBuffer(), preserve=PRESERVE_ALL); @time Pkg.precompile(;io=io)"""
+    # im getting suspicious results here (~0.3 seconds for DataFrames)
+    # jl_cmd = """using Pkg; Pkg.activate("$ptoml";io = IOBuffer()); io = IOBuffer(); Pkg.add("$pkg"; io=IOBuffer(), preserve=PRESERVE_ALL); @time Pkg.precompile(;io=io)"""
+    jl_cmd = """using Pkg; Pkg.activate("$ptoml";io = IOBuffer()); io = IOBuffer(); @time Pkg.add("$pkg"; io=IOBuffer(), preserve=PRESERVE_ALL)"""
     cmd = `$juliabin --startup=no -e $jl_cmd`
     s = read(cmd, String)
     write(joinpath(dir, "$pkg.txt"), s)
+    # touch(joinpath(dir, "$(pkg)_$c"))
 
-    jl_cmd = """using Pkg, InteractiveUtils; Pkg.activate("$ptoml"; io = IOBuffer()); @time_imports using $pkg"""
-    cmd = `$juliabin --startup=no -e $jl_cmd`
-    s = read(cmd, String)
-    df = time_imports_str_to_df(s)
-    CSV.write(joinpath(dir, "time_imports.csv"), df)
-
-    run(`mv $dir $(JuliaBenchmarker.DATADIR)`)
-    newp = joinpath(JuliaBenchmarker.DATADIR, id)
+    if vn >= v"1.8.0"
+        jl_cmd = """using Pkg, InteractiveUtils; Pkg.activate("$ptoml"; io = IOBuffer()); @time_imports using $pkg"""
+        cmd = `$juliabin --startup=no -e $jl_cmd`
+        s = read(cmd, String)
+        df = time_imports_str_to_df(s)
+        CSV.write(joinpath(dir, "time_imports.csv"), df)
+    end
+    # run(`mv $dir $rundir`)
+    newp = joinpath(rundir, id)
     @assert ispath(newp)
+    Pkg.activate(joinpath(@__DIR__, ".."))
     newp
 
 end
