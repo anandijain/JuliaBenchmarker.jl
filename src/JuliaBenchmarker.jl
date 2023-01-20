@@ -152,9 +152,6 @@ function doit(c, pkg)
         df = time_imports_str_to_df(s)
         CSV.write(joinpath(dir, "time_imports.csv"), df)
     end
-    # run(`mv $dir $rundir`)
-    newp = joinpath(rundir, id)
-    @assert ispath(newp)
     Pkg.activate(joinpath(@__DIR__, ".."))
     newp
 
