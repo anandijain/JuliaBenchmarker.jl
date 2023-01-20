@@ -2,7 +2,7 @@ using Pkg
 Pkg.precompile()
 using CSV, DataFrames, JSON3, JSONTables
 s = "273.081066 seconds (7.46 M allocations: 583.687 MiB, 0.10% gc time, 0.06% compilation time)\n"
-
+"  1.338461 seconds (2.83 M allocations: 165.587 MiB, 3.62% gc time)\n"
 parse_at_time(s)
 
 run(`juliaup config channelsymlinks true`)
