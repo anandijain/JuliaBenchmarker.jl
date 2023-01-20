@@ -153,7 +153,7 @@ function doit(c, pkg)
         CSV.write(joinpath(dir, "time_imports.csv"), df)
     end
     Pkg.activate(joinpath(@__DIR__, ".."))
-    newp
+    dir
 
 end
 
