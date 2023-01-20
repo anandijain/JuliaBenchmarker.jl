@@ -19,6 +19,7 @@ jobs:
           juliaup add 1.8
           juliaup add 1.9
           juliaup st
+          echo "${HOME}/.juliaup/bin" >> $GITHUB_PATH
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}
