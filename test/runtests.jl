@@ -4,6 +4,7 @@ using Test
 # run(pipeline(`curl -fsSL https://install.julialang.org`, `sh -s -- -y`))
 # run(`juliaup config channelsymlinks true`)
 # run(`source /home/runner/.bash_profile`)
+run(`juliaup st`)
 
 pkgs = ["Tables", "OrdinaryDiffEq", "DifferentialEquations", "ModelingToolkit", "Plots"]
 pkgs = ["CSV", "DataFrames", "Plots"]
