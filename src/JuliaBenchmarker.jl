@@ -8,7 +8,7 @@ using Pkg, InteractiveUtils
 
 const DATADIR = joinpath(@__DIR__, "../data")
 const TABLES_DF = CSV.read(joinpath(DATADIR, "tables.csv"), DataFrame)
-const OBJ_TABLE = objecttable(TABLES_DF)
+# const OBJ_TABLE = objecttable(TABLES_DF)
 # const CHANNELS = ("1.4", "1.5", "1.6", "1.7", "1.8") #, "1.9")
 CHANNELS = ("1.5", "1.6", "1.7", "1.8") #, "1.9")
 
