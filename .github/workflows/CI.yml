@@ -6,17 +6,19 @@ jobs:
     strategy:
       matrix:
         version:
-          - '1'
+          - '1.9.0-beta3'
     steps:
       - uses: actions/checkout@v2
       - run: |
           curl -fsSL https://install.julialang.org | sh -s -- -y
           source /home/runner/.bash_profile
           juliaup config channelsymlinks true
+          juliaup config modifypath true
           juliaup add 1.6
           juliaup add 1.7
           juliaup add 1.8
           juliaup add 1.9
+          juliaup st
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}
