@@ -11,6 +11,9 @@ jobs:
       - uses: actions/checkout@v2
       - run: |
           curl -fsSL https://install.julialang.org | sh -s -- -y
+          source /home/runner/.bashrc
+          source /home/runner/.profile
+          source /home/runner/.bash_profile
           juliaup config channelsymlinks true
       - uses: julia-actions/setup-julia@v1
         with:
