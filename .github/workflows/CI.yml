@@ -9,6 +9,10 @@ jobs:
           - '1'
     steps:
       - uses: actions/checkout@v2
+      - run: '
+          curl -fsSL https://install.julialang.org | sh -s -- -y
+          juliaup config channelsymlinks true
+          '
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}

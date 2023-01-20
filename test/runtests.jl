@@ -1,8 +1,8 @@
 using JuliaBenchmarker
 using Test
 
-run(pipeline(`curl -fsSL https://install.julialang.org`, `sh -s -- -y`))
-run(`juliaup config channelsymlinks true`)
+# run(pipeline(`curl -fsSL https://install.julialang.org`, `sh -s -- -y`))
+# run(`juliaup config channelsymlinks true`)
 
 
 pkgs = ["Tables", "OrdinaryDiffEq", "DifferentialEquations", "ModelingToolkit", "Plots"]
