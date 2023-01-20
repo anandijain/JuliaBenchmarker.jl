@@ -34,6 +34,31 @@ Cmd
 
 
 # runs
-pkgs = ["OrdinaryDiffEq", "DifferentialEquations", "ModelingToolkit", "Plots"]
-channels = "1." .* string.(5:9)
+pkgs = ["Tables", "OrdinaryDiffEq", "DifferentialEquations", "ModelingToolkit", "Plots"]
+c = channels[4]
+pkg = pkgs[1]
 
+
+
+
+doit("1.8", "OrdinaryDiffEq")
+using JuliaBenchmarker
+channels = "1." .* string.(6:8)
+for c in channels
+    JuliaBenchmarker.doit(c, "DataFrames")
+end
+
+JuliaBenchmarker.doit("1.8", "DataFrames")
+
+
+d = Dict()
+dfns = readdir(JuliaBenchmarker.DATADIR; join=true)
+run_folders = filter(isdir, dfns)
+for dir in run_folders
+    pkg = getdirpkgname(dir)
+    if !haskey(d, pkg)
+        d[pkg] = dir
+    else
+        push!(d[pkg], dir)
+    end
+end

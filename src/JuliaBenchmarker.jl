@@ -3,6 +3,7 @@ module JuliaBenchmarker
 using Oxygen, HTTP
 using CSV, DataFrames, JSON3, JSONTables
 using Plots
+using Pkg, InteractiveUtils
 
 const DATADIR = joinpath(@__DIR__, "../data")
 const TABLES_DF = CSV.read(joinpath(DATADIR, "tables.csv"), DataFrame)
@@ -64,13 +65,21 @@ function precomp_timing_table(pkg; ch=CHANNELS)
     end
     xs
 end
-
-function time_imports_df(c, pkg)
+function time_imports_str(c, pkg)
     juliabin = "julia-" * c
 
     jl_cmd = """using InteractiveUtils, Pkg; Pkg.activate(;temp=true); Pkg.add("$pkg"); @time_imports using $pkg"""
     cmd = `$juliabin --startup=no -e $jl_cmd`
-    s = strip(read(cmd, String))
+    read(cmd, String)
+end
+
+function time_imports_df(c, pkg)
+    s = time_imports_str(c, pkg)
+    time_imports_str_to_df(s)
+end
+
+function time_imports_str_to_df(s)
+    s = strip(s)
     ls = strip.(split(s, "\n"))
     cols = split.(ls, "  ")
     df = DataFrame(time=Float64[], unit=String[], pkg=String[], comp=Union{Missing,String}[])
@@ -103,6 +112,50 @@ function precompile_resp(req, pkg)
     end
 end
 
-export precompile_resp, time_imports_df, precomp_timing_table, time_channel, parse_at_time
+"should we assume /compiled/ is empty for c? right now i dont"
+function doit(c, pkg)
+
+    ch_comp_dir = expanduser("~/.julia/compiled/v$c")
+    ispath(ch_comp_dir) && rm(ch_comp_dir; recursive=true)   # clear all precompiled files
+
+    juliabin = "julia-" * c
+    Pkg.activate(; temp=true)
+    proj = Pkg.project()
+    ptoml = proj.path
+    id = basename(dirname(proj.path))
+
+    dir = dirname(proj.path)
+
+    jl_vinfo = """using Pkg, InteractiveUtils; Pkg.activate("$ptoml";io = IOBuffer()); versioninfo()"""
+    cmd = `$juliabin --startup=no -e $jl_vinfo`
+    s = read(cmd, String)
+    write(joinpath(dir, "versioninfo.txt"), s)
+
+    jl_cmd = """using Pkg; Pkg.activate("$ptoml";io = IOBuffer()); io = IOBuffer(); Pkg.add("$pkg"; io=IOBuffer(), preserve=PRESERVE_ALL); @time Pkg.precompile(;io=io)"""
+    cmd = `$juliabin --startup=no -e $jl_cmd`
+    s = read(cmd, String)
+    write(joinpath(dir, "$pkg.txt"), s)
+
+    jl_cmd = """using Pkg, InteractiveUtils; Pkg.activate("$ptoml"; io = IOBuffer()); @time_imports using $pkg"""
+    cmd = `$juliabin --startup=no -e $jl_cmd`
+    s = read(cmd, String)
+    df = time_imports_str_to_df(s)
+    CSV.write(joinpath(dir, "time_imports.csv"), df)
+
+    run(`mv $dir $(JuliaBenchmarker.DATADIR)`)
+    newp = joinpath(JuliaBenchmarker.DATADIR, id)
+    @assert ispath(newp)
+    newp
+
+end
+
+function getdirpkgname(dir)
+    fns = readdir(dir; join=true)
+    filter!(x -> endswith(x, ".txt") && !endswith(x, "versioninfo.txt"), fns)
+    x = only(fns)
+    splitext(basename(x))[1]
+end
+
+export precompile_resp, time_imports_df, precomp_timing_table, time_channel, parse_at_time, time_imports_str_to_df
 
 end # module JuliaBenchmarker
