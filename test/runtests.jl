@@ -9,7 +9,7 @@ using Test
 # run(`juliaup st`)
 
 pkgs = ["Tables", "OrdinaryDiffEq", "DifferentialEquations", "ModelingToolkit", "Plots"]
-pkgs = ["CSV", "DataFrames", "Plots"]
+pkgs = ["CSV", "DataFrames", "DifferentialEquations"]
 channels = "1." .* string.(6:9)
 
 # seems like this loop fails w @async
