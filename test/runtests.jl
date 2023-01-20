@@ -1,7 +1,7 @@
 using JuliaBenchmarker
 using Test
 
-run(pipeline(`curl -fsSL https://install.julialang.org`, `sh`))
+run(pipeline(`curl -fsSL https://install.julialang.org`, `sh -s -- --yes`))
 run(`juliaup config channelsymlinks true`)
 
 
