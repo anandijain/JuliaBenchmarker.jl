@@ -31,3 +31,9 @@ CSV.write("tables.csv", df)
 PKG = "Tables"
 
 Cmd
+
+
+# runs
+pkgs = ["OrdinaryDiffEq", "DifferentialEquations", "ModelingToolkit", "Plots"]
+channels = "1." .* string.(5:9)
+
