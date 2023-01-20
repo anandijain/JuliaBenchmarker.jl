@@ -6,7 +6,7 @@ using Test
 # run(`source /home/runner/.bash_profile`)
 
 ### WHY CANT CI find juliaup 
-run(`juliaup st`)
+# run(`juliaup st`)
 
 pkgs = ["Tables", "OrdinaryDiffEq", "DifferentialEquations", "ModelingToolkit", "Plots"]
 pkgs = ["CSV", "DataFrames", "Plots"]
