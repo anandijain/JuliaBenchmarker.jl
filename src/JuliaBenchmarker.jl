@@ -2,7 +2,7 @@ module JuliaBenchmarker
 
 using Oxygen, HTTP
 using CSV, DataFrames, JSON3, JSONTables
-using Plots
+# using Plots
 using Pkg, InteractiveUtils
 
 const DATADIR = joinpath(@__DIR__, "../data")
