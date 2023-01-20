@@ -15,6 +15,10 @@ jobs:
           source /home/runner/.profile
           source /home/runner/.bash_profile
           juliaup config channelsymlinks true
+          juliaup add 1.6
+          juliaup add 1.7
+          juliaup add 1.8
+          juliaup add 1.9
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}
