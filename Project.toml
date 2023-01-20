@@ -1,0 +1,13 @@
+name = "JuliaBenchmarker"
+uuid = "b8048953-7bfc-4e48-9255-1574a7731537"
+authors = ["anand jain <anandj@uchicago.edu>"]
+version = "0.1.0"
+
+[deps]
+Oxygen = "df9a0d86-3283-4920-82dc-4555fc0d1d8b"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
