@@ -1,5 +1,5 @@
 using JuliaBenchmarker
-using LinuxPerf
+using LinuxPerf, PProf
 using Test
 using CSV, DataFrames
 
@@ -28,6 +28,3 @@ end
 d = joinpath(JuliaBenchmarker.DATADIR, "runs", "DataFrames", "1_8")
 @test isdir(d)
 @test !isempty(readdir(d))
-
-# m = @measure CSV.read(joinpath(JuliaBenchmarker.DATADIR, "tables.csv"))
-

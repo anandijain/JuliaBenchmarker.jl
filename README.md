@@ -2,6 +2,12 @@
 
 a https://perf.rust-lang.org/ like rest api for julia
 
+primarily the goal is to measure 
+1. precompile times
+2. using times
+3. TTFX
+for a bunch of different julia packages and versions
+
 
 make sure that you have juliaup installed 
 
