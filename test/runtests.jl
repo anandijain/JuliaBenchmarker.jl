@@ -1,5 +1,7 @@
 using JuliaBenchmarker
+using LinuxPerf
 using Test
+using CSV, DataFrames
 
 # run(pipeline(`curl -fsSL https://install.julialang.org`, `sh -s -- -y`))
 # run(`juliaup config channelsymlinks true`)
@@ -9,7 +11,8 @@ using Test
 # run(`juliaup st`)
 
 pkgs = ["Tables", "OrdinaryDiffEq", "DifferentialEquations", "ModelingToolkit", "Plots"]
-pkgs = ["CSV", "DataFrames", "DifferentialEquations"]
+
+pkgs = ["CSV", "DataFrames", "OrdinaryDiffEq"]
 channels = "1." .* string.(6:9)
 
 # seems like this loop fails w @async
@@ -25,3 +28,6 @@ end
 d = joinpath(JuliaBenchmarker.DATADIR, "runs", "DataFrames", "1_8")
 @test isdir(d)
 @test !isempty(readdir(d))
+
+# m = @measure CSV.read(joinpath(JuliaBenchmarker.DATADIR, "tables.csv"))
+

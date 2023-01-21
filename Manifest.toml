@@ -2,7 +2,7 @@
 
 julia_version = "1.9.0-beta3"
 manifest_format = "2.0"
-project_hash = "cdb4623261aba12b9ac16e2fe2636fbff219a821"
+project_hash = "048cd21269c3faab54012720f0b22abc0fe4468d"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -142,6 +142,12 @@ uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 [[deps.LinearAlgebra]]
 deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+
+[[deps.LinuxPerf]]
+deps = ["Formatting", "PrettyTables", "Printf"]
+git-tree-sha1 = "49c26d43f9a534c523ea76fc65bee13484b671a4"
+uuid = "b4c46c6c-4fb0-484d-a11a-41bc3392d094"
+version = "0.3.4"
 
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
