@@ -9,13 +9,15 @@ primarily the goal is to measure
 for a bunch of different julia packages and versions
 
 
-make sure that you have juliaup installed 
+make sure that you have juliaup installed
 
 run test/server.jl 
 warning! endpoints delete .julia/environments/{channel} and .julia/registries/{channel}
 
 
 a big thing to do is adding a bunch of different command line args to test, for instance, optlevel
+
+`precomp_time_str_to_df` requires `Pkg.precompile(;timing=true)` (so nightly atm)
 
 ## todo
 * do something with https://github.com/JuliaPerf/LinuxPerf.jl

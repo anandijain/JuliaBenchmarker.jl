@@ -1,6 +1,6 @@
 module JuliaBenchmarker
 
-# using Oxygen, HTTP
+# using HTTP
 using CSV, DataFrames
 # , JSON3, JSONTables
 # using Plots
@@ -98,19 +98,39 @@ function time_imports_str_to_df(s)
     df
 end
 
-function precompile_resp(req, pkg)
-    q = queryparams(req)
-    @info q
-    xs = precomp_timing_table(pkg)
-    df = DataFrame(xs)
-    if get(q, "plot", nothing) == "true"
-        plt = plot(df.version, parse.(Float64, df.secs); xaxis="julia_version", yaxis="precompilation time [s]", legend=false, title="$pkg precompilation time")
-        io = IOBuffer()
-        png(plt, io)
-        HTTP.Response(200, ["Content-Type" => "image/png"]; body=take!(io))
+function precomp_time_str_to_df(s)
+    rs = precomp_time_nt(s)
+    df = DataFrame(rs)
+    sort!(df, :time; rev=true)
+    df
+end
+
+function precomp_time_nt(s)
+    s = strip(s)
+    ss = strip.(split(s, "\n"))
+    idx = findfirst(contains("dependencies"), ss)
+    wall_time = split(ss[idx], " ")[end-1]
+    parse_precomp_time_row.(ss[2:idx-1])
+end
+
+function parse_precomp_time_row(l)
+    ms = collect(eachmatch(Base.ansi_regex, l))
+    j = join(filter(x -> length(x) == 1, map(x -> x.match, ms)))
+    xs = split(j)
+    time, check = xs[[1, 3]]
+    time = parse(Float64, time)
+    if length(xs) == 6
+        name, extname = xs[[4, 6]]
     else
-        JSONTables.objecttable(df)
+        name = xs[4]
+        extname = missing
     end
+    (; time, check, name, extname)
+end
+
+function get_dfs(dir)
+    s1, s2 = read.([joinpath(dir, "precomp.txt"), joinpath(dir, "using.txt")], String)
+    precomp_time_str_to_df(s1), time_imports_str_to_df(s2)
 end
 
 "should we assume /compiled/ is empty for c? right now i dont"
@@ -162,6 +182,44 @@ function getdirpkgname(dir)
     filter!(x -> endswith(x, ".txt") && !endswith(x, "versioninfo.txt"), fns)
     x = only(fns)
     splitext(basename(x))[1]
+end
+
+"""give path of package in project, time precomp, using, and execute the script, generating a PProf"""
+function time_bin(fn)
+    p = abspath(fn)
+
+    error()
+end
+
+function doit2(dir; c="1.10")
+    # assume we have as little as possible compiled
+    ENV["JULIA_PKG_PRECOMPILE_AUTO"] = false
+    fs = ["compiled", "environments"]#, "artifacts"]
+    for f in fs
+        p = expanduser("~/.julia/$f/v$c")
+        ispath(p) && rm(p; recursive=true)   # clear all precompiled files
+    end
+    io_ = IOBuffer()
+    Pkg.activate(dir;io=io_)
+    Pkg.resolve(;io=io_)
+    Pkg.instantiate(;io=io_)
+    io = IOBuffer()
+    Pkg.precompile(; io, timing=true)
+    s = String(take!(io))
+    fn = joinpath(dir, "precomp.txt")
+    write(fn, s)
+
+    pkgs_str = join(collect(keys(Pkg.project().dependencies)), ", ")
+    # is there a way to avoid starting a new julia process
+    jl_cmd = """using Pkg, InteractiveUtils; Pkg.activate("$dir"; io = IOBuffer()); @time_imports using $pkgs_str"""
+    cmd = `julia-nightly --startup=no -e $jl_cmd`
+
+    s2 = read(cmd, String)
+    fn2 = joinpath(dir, "using.txt")
+    write(fn2, s2)
+    Pkg.activate(dirname(@__DIR__))
+
+    [fn, fn2]
 end
 
 export precompile_resp, time_imports_df, precomp_timing_table, time_channel, parse_at_time, time_imports_str_to_df
